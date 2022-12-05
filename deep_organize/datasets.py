@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 
 
 class PointDataset(Dataset):
-    def __init__(self, n : int, num_samples:int= 1):
+    def __init__(self, num_points : int, num_samples:int= 1):
 
         # Fixing for now
-        self._data = torch.tensor(num_samples, n*2)
+        self._data = torch.rand(num_samples, num_points*2)
         self._num_samples = num_samples
 
     def __len__(self) -> int:
-        return len(self._num_samples)
+        return self._num_samples
 
     def __getitem__(self, idx: int):
         return self._data, self._data
@@ -50,11 +50,11 @@ class PointDataModule(LightningDataModule):
     def setup(self, stage: Optional[str] = None):
 
         self._train_dataset = PointDataset(
-            n=self._num_points,
+            num_points=self._num_points,
             num_samples=self._num_samples
         )
         self._test_dataset = PointDataset(
-            num_samples=self._num_samples
+            num_points=self._num_points, num_samples=self._num_samples
         )
 
     @property

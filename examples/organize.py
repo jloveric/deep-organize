@@ -7,10 +7,8 @@ from pytorch_lightning import Trainer
 import matplotlib.pyplot as plt
 from high_order_implicit_representation.networks import Net
 from pytorch_lightning.callbacks import LearningRateMonitor
-from high_order_implicit_representation.rendering import ImageGenerator
-from high_order_implicit_representation.single_image_dataset import (
-    image_to_dataset,
-    ImageDataModule,
+from deep_organize.datasets import (
+    PointDataModule,
 )
 import logging
 
@@ -19,8 +17,8 @@ logger = logging.getLogger(__name__)
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-@hydra.main(config_path="../config", config_name="images_config")
-def run_implicit_images(cfg: DictConfig):
+@hydra.main(config_path="../config", config_name="organize")
+def run_organize(cfg: DictConfig):
 
     logger.info(OmegaConf.to_yaml(cfg))
     logger.info(f"Working directory {os.getcwd()}")
@@ -29,12 +27,10 @@ def run_implicit_images(cfg: DictConfig):
     root_dir = hydra.utils.get_original_cwd()
 
     if cfg.train is True:
-        full_path = [f"{root_dir}/{path}" for path in cfg.images]
-        data_module = ImageDataModule(
-            filenames=full_path, batch_size=cfg.batch_size, rotations=cfg.rotations
-        )
-        image_generator = ImageGenerator(
-            filename=full_path[0], rotations=cfg.rotations, batch_size=cfg.batch_size
+        data_module = PointDataModule(
+            num_points=cfg.data.num_points,
+            num_samples=cfg.data.num_samples,
+            batch_size=cfg.batch_size,
         )
         lr_monitor = LearningRateMonitor(logging_interval="epoch")
         trainer = Trainer(
@@ -43,7 +39,7 @@ def run_implicit_images(cfg: DictConfig):
         trainer = Trainer(
             max_epochs=cfg.max_epochs,
             gpus=cfg.gpus,
-            callbacks=[lr_monitor, image_generator],
+            callbacks=[lr_monitor],
         )
         model = Net(cfg)
         trainer.fit(model, datamodule=data_module)
@@ -85,4 +81,4 @@ def run_implicit_images(cfg: DictConfig):
 
 
 if __name__ == "__main__":
-    run_implicit_images()
+    run_organize()
