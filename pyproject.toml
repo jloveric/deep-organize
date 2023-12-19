@@ -7,10 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-torch = "^1.13.0"
-high-order-layers-torch = "^1.1.18"
-high-order-implicit-representation = "^0.2.0"
-pytorch-lightning = "^1.8.3"
+torch = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.0"

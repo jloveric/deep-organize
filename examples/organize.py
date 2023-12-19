@@ -5,7 +5,6 @@ from high_order_layers_torch.layers import *
 from high_order_layers_torch.networks import *
 from pytorch_lightning import Trainer
 import matplotlib.pyplot as plt
-from high_order_implicit_representation.networks import Net
 from pytorch_lightning.callbacks import LearningRateMonitor
 from deep_organize.datasets import (
     PointDataModule,
