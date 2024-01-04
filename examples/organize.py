@@ -3,9 +3,9 @@ from omegaconf import DictConfig, OmegaConf
 import hydra
 from high_order_layers_torch.layers import *
 from high_order_layers_torch.networks import *
-from pytorch_lightning import Trainer
+from lightning import Trainer
 import matplotlib.pyplot as plt
-from pytorch_lightning.callbacks import LearningRateMonitor
+from lightning.callbacks import LearningRateMonitor
 from deep_organize.datasets import (
     PointDataModule,
 )
