@@ -205,7 +205,7 @@ class Net(RegressionMixin, PredictionNetMixin, pl.LightningModule):
         super().__init__()
         self.save_hyperparameters(cfg)
         self.cfg = cfg
-        self.model = 
+        self.model = Transformer(input_size=cfg.input_size,output_size=cfg.output_size,layer=cfg.layers,nhead=cfg.n_head, bias=cfg.bias, dropout=cfg.dropout)
 
         self.loss = torch.nn.functional.mse_loss
 
