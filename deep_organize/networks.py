@@ -10,6 +10,7 @@ from lion_pytorch import Lion
 from torch import Tensor
 import torch.optim as optim
 from torchmetrics import Accuracy
+from deep_organize.loss import equidistance2d_loss
 
 
 logger = logging.getLogger(__name__)
@@ -137,7 +138,7 @@ class Transformer(nn.Module):
 
 class RegressionMixin:
     def eval_step(self, batch: Tensor, name: str):
-        x, y, idx = batch
+        x = batch
         y_hat = self(x)
         loss = self.loss(y_hat.flatten(), y.flatten())
 
@@ -208,6 +209,6 @@ class Net(RegressionMixin, PredictionNetMixin, pl.LightningModule):
         self.cfg = cfg
         self.model = Transformer(input_size=cfg.input_size,output_size=cfg.output_size,layers=cfg.layers,n_head=cfg.n_head, bias=cfg.bias, dropout=cfg.dropout)
 
-        self.loss = torch.nn.functional.mse_loss
+        self.loss = equidistance2d_loss
 
     
