@@ -7,14 +7,14 @@ import math
 import logging
 from torch.utils.data import DataLoader, Dataset
 from typing import Optional, List
-from pytorch_lightning import LightningDataModule
+from lightning.pytorch import LightningDataModule
 
 logger = logging.getLogger(__name__)
 
 
 class PointDataset(Dataset):
     def __init__(self, num_points : int, num_samples:int= 1):
-
+        super().__init__()
         # Fixing for now
         self._data = torch.rand(num_samples, num_points*2)
         self._num_samples = num_samples

@@ -1,4 +1,4 @@
-input_size: 5
+input_size: 20
 output_size: 5
 n_head : 4
 layers: 4

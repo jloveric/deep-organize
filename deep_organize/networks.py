@@ -3,7 +3,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 from omegaconf import DictConfig
 import logging
 from lion_pytorch import Lion
@@ -120,10 +120,11 @@ class Transformer(nn.Module):
         bias: bool = True,
         dropout: int = 0.0,
     ):
+        super().__init__()
         layer_list = []
         for i in range(layers):
             layer_list.append(
-                Block(input_size=input_size, n_head=n_head, bias=bias, dropout=dropout)
+                Block(n_embd=input_size, n_head=n_head, bias=bias, dropout=dropout)
             )
 
         output = nn.Linear(input_size, output_size, bias=bias)
