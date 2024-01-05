@@ -9,8 +9,6 @@ from torch.utils.data import DataLoader, Dataset
 from typing import Optional, List
 from pytorch_lightning import LightningDataModule
 
-from high_order_layers_torch.utils import positions_from_mesh
-
 logger = logging.getLogger(__name__)
 
 

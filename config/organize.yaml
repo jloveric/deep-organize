@@ -1,11 +1,11 @@
-input_width: 5
-output_width: 5
+input_size: 5
+output_size: 5
 n_head : 4
 layers: 4
-
+bias: True
+dropout: 0
 
 max_epochs: 50
-gpus: 1
 lr: 1e-3
 batch_size: 1
 
@@ -13,6 +13,12 @@ batch_size: 1
 train: True
 checkpoint: null
 rotations: 1 # 1 is x,y, 2 is x,y, x-y, x+y, greater includes additional rotations
+accelerator: cuda
+
+data:
+  num_points: 100
+  num_samples: 1000
+
 
 defaults:
   - optimizer: lion

@@ -1,15 +1,14 @@
 import os
 from omegaconf import DictConfig, OmegaConf
 import hydra
-from high_order_layers_torch.layers import *
-from high_order_layers_torch.networks import *
 from lightning import Trainer
 import matplotlib.pyplot as plt
-from lightning.callbacks import LearningRateMonitor
+from lightning.pytorch.callbacks import LearningRateMonitor
 from deep_organize.datasets import (
     PointDataModule,
 )
 import logging
+from deep_organize.networks import Net
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -33,12 +32,7 @@ def run_organize(cfg: DictConfig):
         )
         lr_monitor = LearningRateMonitor(logging_interval="epoch")
         trainer = Trainer(
-            max_epochs=cfg.max_epochs, gpus=cfg.gpus, callbacks=[lr_monitor]
-        )
-        trainer = Trainer(
-            max_epochs=cfg.max_epochs,
-            gpus=cfg.gpus,
-            callbacks=[lr_monitor],
+            max_epochs=cfg.max_epochs, accelerator=cfg.accelerator, callbacks=[lr_monitor]
         )
         model = Net(cfg)
         trainer.fit(model, datamodule=data_module)
