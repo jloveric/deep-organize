@@ -35,7 +35,7 @@ def run_organize(cfg: DictConfig):
         trainer = Trainer(
             max_epochs=cfg.max_epochs,
             accelerator=cfg.accelerator,
-            callbacks=[lr_monitor, ImageSampler(dim=cfg.data.dim, image_size=64)],
+            callbacks=[lr_monitor, ImageSampler(dim=cfg.data.dims, image_size=64)],
         )
         model = Net(cfg)
         trainer.fit(model, datamodule=data_module)

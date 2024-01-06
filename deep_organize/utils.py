@@ -24,9 +24,9 @@ def generate_result(
 
     result_list = []
     for power in range(5):
-        data = torch.rand(1, pow(2, power + 4), dim).to(device)
-        result = model(data)
-        result_list.append(result)
+        data = torch.rand(1, pow(2, power + 4), dim).to(model.device)
+        result = model(data).to('cpu')
+        result_list.append(result.detach())
 
     return result_list
 
@@ -48,7 +48,6 @@ class ImageSampler(Callback):
         all_data_list = generate_result(
             model=pl_module,
             dim=self._dim,
-            image_size=self._image_size,
         )
 
         for data in all_data_list:
@@ -71,10 +70,15 @@ class ImageSampler(Callback):
             buf.seek(0)
             image = PIL.Image.open(buf)
             image = transforms.ToTensor()(image)
-
+            #print('image.shape', image.shape)
+            #trainer.logger.experiment.add_image(
+            #    "img",
+            #    torch.tensor(image).detach().permute(2, 0, 1),
+            #    global_step=trainer.global_step,
+            #)
             trainer.logger.experiment.add_image(
                 "img",
-                torch.tensor(image).permute(2, 0, 1),
+                torch.tensor(image).detach(),
                 global_step=trainer.global_step,
             )
             plt.close()
