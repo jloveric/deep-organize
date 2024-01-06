@@ -16,7 +16,7 @@ rotations: 1 # 1 is x,y, 2 is x,y, x-y, x+y, greater includes additional rotatio
 accelerator: cuda
 
 data:
-  num_points: 100
+  num_points: ${input_size}
   num_samples: 1000
 
 

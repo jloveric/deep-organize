@@ -25,6 +25,8 @@ class LayerNorm(nn.Module):
         self.bias = nn.Parameter(torch.zeros(ndim)) if bias else None
 
     def forward(self, input):
+        print('input.shape', input.shape)
+        print('weight.shape', self.weight.shape)
         return F.layer_norm(input, self.weight.shape, self.weight, self.bias, 1e-5)
 
 
@@ -106,8 +108,15 @@ class Block(nn.Module):
         self.mlp = MLP(n_embd, bias, dropout)
 
     def forward(self, x):
-        x = x + self.attn(self.ln_1(x))
-        x = x + self.mlp(self.ln_2(x))
+        print('x.shape', x.shape)
+        x = self.ln_1(x)
+        print('x1.shape',x.shape)
+        x = x + self.attn(x)
+        print('x3.shape',x.shape)
+        x = self.ln_2(x)
+        print('x4.shape',x.shape)
+        x = x + self.mlp(x)
+        print('x5.shape',x.shape)
         return x
 
 
@@ -140,7 +149,7 @@ class RegressionMixin:
     def eval_step(self, batch: Tensor, name: str):
         x = batch
         y_hat = self(x)
-        loss = self.loss(y_hat.flatten(), y.flatten())
+        loss = self.loss(y_hat)
 
         self.log(f"{name}_loss", loss, prog_bar=True)
         return loss

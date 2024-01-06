@@ -13,10 +13,14 @@ logger = logging.getLogger(__name__)
 
 
 class PointDataset(Dataset):
-    def __init__(self, num_points : int, num_samples:int= 1):
+    def __init__(self, num_points: int, num_samples: int = 1, dim: int = 2):
+        """
+        :params num_points: number of points in a sample.
+        :params num_samples: number of examples.
+        """
         super().__init__()
         # Fixing for now
-        self._data = torch.rand(num_samples, num_points*2)
+        self._data = torch.rand(num_samples, num_points, dim)
         self._num_samples = num_samples
 
     def __len__(self) -> int:
@@ -32,6 +36,7 @@ class PointDataModule(LightningDataModule):
         num_points: int = 10,
         num_samples: int = 1,
         num_workers: int = 10,
+        dim: int = 2,
         pin_memory: int = True,
         batch_size: int = 32,
         shuffle: bool = True,
@@ -41,18 +46,17 @@ class PointDataModule(LightningDataModule):
         self._num_points = num_points
         self._num_samples = num_samples
         self._num_workers = num_workers
+        self._dim = dim
         self._pin_memory = pin_memory
         self._batch_size = batch_size
         self._shuffle = shuffle
-        
-    def setup(self, stage: Optional[str] = None):
 
+    def setup(self, stage: Optional[str] = None):
         self._train_dataset = PointDataset(
-            num_points=self._num_points,
-            num_samples=self._num_samples
+            num_points=self._num_points, num_samples=self._num_samples, dim=self._dim
         )
         self._test_dataset = PointDataset(
-            num_points=self._num_points, num_samples=self._num_samples
+            num_points=self._num_points, num_samples=self._num_samples, dim=self._dim
         )
 
     @property
