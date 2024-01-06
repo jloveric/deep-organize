@@ -9,6 +9,7 @@ from deep_organize.datasets import (
 )
 import logging
 from deep_organize.networks import Net
+from deep_organize.utils import ImageSampler
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -17,7 +18,6 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 @hydra.main(config_path="../config", config_name="organize")
 def run_organize(cfg: DictConfig):
-
     logger.info(OmegaConf.to_yaml(cfg))
     logger.info(f"Working directory {os.getcwd()}")
     logger.info(f"Orig working directory {hydra.utils.get_original_cwd()}")
@@ -33,7 +33,9 @@ def run_organize(cfg: DictConfig):
         )
         lr_monitor = LearningRateMonitor(logging_interval="epoch")
         trainer = Trainer(
-            max_epochs=cfg.max_epochs, accelerator=cfg.accelerator, callbacks=[lr_monitor]
+            max_epochs=cfg.max_epochs,
+            accelerator=cfg.accelerator,
+            callbacks=[lr_monitor, ImageSampler(dim=cfg.data.dim, image_size=64)],
         )
         model = Net(cfg)
         trainer.fit(model, datamodule=data_module)
