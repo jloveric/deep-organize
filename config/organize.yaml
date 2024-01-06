@@ -1,6 +1,7 @@
-input_size: 20
+input_size: 3
 output_size: 5
-n_head : 4
+dims : 3
+n_head : 3
 layers: 4
 bias: True
 dropout: 0
@@ -16,8 +17,9 @@ rotations: 1 # 1 is x,y, 2 is x,y, x-y, x+y, greater includes additional rotatio
 accelerator: cuda
 
 data:
-  num_points: ${input_size}
+  num_points: 20
   num_samples: 1000
+  dims: ${input_size}
 
 
 defaults:

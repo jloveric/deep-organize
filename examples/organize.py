@@ -29,7 +29,7 @@ def run_organize(cfg: DictConfig):
             num_points=cfg.data.num_points,
             num_samples=cfg.data.num_samples,
             batch_size=cfg.batch_size,
-            dim=cfg.input_size,
+            dim=cfg.data.dims,
         )
         lr_monitor = LearningRateMonitor(logging_interval="epoch")
         trainer = Trainer(

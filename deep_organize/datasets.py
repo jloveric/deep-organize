@@ -27,7 +27,7 @@ class PointDataset(Dataset):
         return self._num_samples
 
     def __getitem__(self, idx: int):
-        return self._data
+        return self._data[idx]
 
 
 class PointDataModule(LightningDataModule):
