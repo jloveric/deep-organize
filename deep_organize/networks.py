@@ -16,6 +16,7 @@ from deep_organize.loss import equidistance2d_loss
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
+
 class LayerNorm(nn.Module):
     """LayerNorm but with an optional bias. PyTorch doesn't support simply bias=False"""
 
@@ -118,19 +119,24 @@ class Transformer(nn.Module):
         self,
         input_size: int,
         output_size: int,
+        embedding_size: int,
         layers: int,
         n_head: int = 4,
         bias: bool = True,
         dropout: int = 0.0,
     ):
         super().__init__()
-        layer_list = []
+
+        # Expand the input dimensions
+        embedding = nn.Linear(input_size, embedding_size, bias=bias)
+
+        layer_list = [embedding]
         for i in range(layers):
             layer_list.append(
-                Block(n_embd=input_size, n_head=n_head, bias=bias, dropout=dropout)
+                Block(n_embd=embedding_size, n_head=n_head, bias=bias, dropout=dropout)
             )
 
-        output = nn.Linear(input_size, output_size, bias=bias)
+        output = nn.Linear(embedding_size, output_size, bias=bias)
         layer_list.append(output)
         self.model = torch.nn.Sequential(*layer_list)
 
@@ -163,7 +169,6 @@ class PredictionNetMixin:
         return self.eval_step(batch, "test")
 
     def configure_optimizers(self):
-        
         if self.cfg.optimizer.name == "lion":
             optimizer = Lion(
                 self.parameters(), lr=self.cfg.optimizer.lr, weight_decay=0.0
@@ -203,14 +208,19 @@ class PredictionNetMixin:
             return [optimizer], [scheduler]
 
 
-
 class Net(RegressionMixin, PredictionNetMixin, pl.LightningModule):
-    def __init__(self, cfg: DictConfig) :
+    def __init__(self, cfg: DictConfig):
         super().__init__()
         self.save_hyperparameters(cfg)
         self.cfg = cfg
-        self.model = Transformer(input_size=cfg.input_size,output_size=cfg.output_size,layers=cfg.layers,n_head=cfg.n_head, bias=cfg.bias, dropout=cfg.dropout)
+        self.model = Transformer(
+            input_size=cfg.input_size,
+            output_size=cfg.output_size,
+            embedding_size=cfg.embedding_size,
+            layers=cfg.layers,
+            n_head=cfg.n_head,
+            bias=cfg.bias,
+            dropout=cfg.dropout,
+        )
 
         self.loss = equidistance2d_loss
-
-    

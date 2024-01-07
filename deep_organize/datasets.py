@@ -8,6 +8,7 @@ import logging
 from torch.utils.data import DataLoader, Dataset
 from typing import Optional, List
 from lightning.pytorch import LightningDataModule
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -24,10 +25,10 @@ class PointDataset(Dataset):
         self._num_samples = num_samples
 
     def __len__(self) -> int:
-        return self._num_samples
+        return self._num_samples*self._num_samples
 
     def __getitem__(self, idx: int):
-        return self._data[idx]
+        return self._data[idx%self._num_samples]
 
 
 class PointDataModule(LightningDataModule):
@@ -50,6 +51,14 @@ class PointDataModule(LightningDataModule):
         self._pin_memory = pin_memory
         self._batch_size = batch_size
         self._shuffle = shuffle
+
+    def collate_fn(self, batch) -> tuple[Tensor, Tensor, list[int]]:
+        # TODO: this does not make sense to me
+        # The max size includes the output
+
+        this_size = random.randint(2, self._num_points - 1)
+        final_features = torch.stack([element[:this_size, :] for element in batch])
+        return final_features
 
     def setup(self, stage: Optional[str] = None):
         self._train_dataset = PointDataset(
@@ -75,6 +84,7 @@ class PointDataModule(LightningDataModule):
             pin_memory=self._pin_memory,
             num_workers=self._num_workers,
             drop_last=True,  # Needed for batchnorm
+            collate_fn=self.collate_fn,
         )
 
     def test_dataloader(self) -> DataLoader:
@@ -85,4 +95,5 @@ class PointDataModule(LightningDataModule):
             pin_memory=self._pin_memory,
             num_workers=self._num_workers,
             drop_last=True,
+            collate_fn=self.collate_fn,
         )

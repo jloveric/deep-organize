@@ -44,13 +44,12 @@ class ImageSampler(Callback):
     @rank_zero_only
     def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
         pl_module.eval()
-        logger.info("Generating sample")
         all_data_list = generate_result(
             model=pl_module,
             dim=self._dim,
         )
 
-        for data in all_data_list:
+        for index, data in enumerate(all_data_list):
             x = data[0, :, 0]
             y = data[0, :, 1]
             plt.scatter(x, y)
@@ -77,8 +76,9 @@ class ImageSampler(Callback):
             #    global_step=trainer.global_step,
             #)
             trainer.logger.experiment.add_image(
-                "img",
+                f"img{index}",
                 torch.tensor(image).detach(),
                 global_step=trainer.global_step,
             )
-            plt.close()
+            plt.clf()
+        #plt.close()
