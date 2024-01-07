@@ -1,14 +1,14 @@
 input_size: 2
 output_size: 5
-n_head : 2
+n_head : 10
 layers: 4
 bias: True
 dropout: 0
-embedding_size: 10
+embedding_size: 100
 
 max_epochs: 50
 lr: 1e-3
-batch_size: 10
+batch_size: 1024
 
 # Are you training? Otherwise plot the result
 train: True
