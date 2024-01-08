@@ -1,5 +1,5 @@
 input_size: 2
-output_size: 5
+output_size: 2
 n_head : 10
 layers: 4
 bias: True

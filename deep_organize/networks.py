@@ -148,7 +148,7 @@ class RegressionMixin:
     def eval_step(self, batch: Tensor, name: str):
         x = batch
         y_hat = self(x)
-        loss = self.loss(y_hat)
+        loss = self.loss(y_hat, x)
 
         self.log(f"{name}_loss", loss, prog_bar=True)
         return loss

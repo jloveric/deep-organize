@@ -30,6 +30,27 @@ class PointDataset(Dataset):
     def __getitem__(self, idx: int):
         return self._data[idx%self._num_samples]
 
+class RectangleDataset(Dataset):
+    def __init__(self, num_rectangles: int, num_samples: int = 1, dim: int = 2):
+        """
+        :params num_points: number of points in a sample.
+        :params num_samples: number of examples.
+        """
+        super().__init__()
+
+        self._dim = dim
+
+        # Hyper rectangle, corner position (dim), and length, height, width...(dim)
+        self._data = torch.rand(num_samples, num_rectangles, 2*dim)
+
+        self._num_samples = num_samples
+
+    def __len__(self) -> int:
+        return self._num_samples*self._num_samples
+
+    def __getitem__(self, idx: int):
+        return self._data[idx%self._num_samples]
+
 
 class PointDataModule(LightningDataModule):
     def __init__(
@@ -41,6 +62,7 @@ class PointDataModule(LightningDataModule):
         pin_memory: int = True,
         batch_size: int = 32,
         shuffle: bool = True,
+        dataset : Dataset = PointDataset
     ):
         super().__init__()
 
@@ -51,6 +73,7 @@ class PointDataModule(LightningDataModule):
         self._pin_memory = pin_memory
         self._batch_size = batch_size
         self._shuffle = shuffle
+        self._dataset = dataset
 
     def collate_fn(self, batch) -> tuple[Tensor, Tensor, list[int]]:
         # TODO: this does not make sense to me
@@ -61,10 +84,10 @@ class PointDataModule(LightningDataModule):
         return final_features
 
     def setup(self, stage: Optional[str] = None):
-        self._train_dataset = PointDataset(
+        self._train_dataset = self._dataset(
             num_points=self._num_points, num_samples=self._num_samples, dim=self._dim
         )
-        self._test_dataset = PointDataset(
+        self._test_dataset = self._dataset(
             num_points=self._num_points, num_samples=self._num_samples, dim=self._dim
         )
 
