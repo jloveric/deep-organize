@@ -58,4 +58,5 @@ def overlap_loss(
     final_tensor = input
     final_tensor[:,:,0:dim] = x
 
-    
+    b=final_tensor.repeat_interleave(input.shape[1])
+    print('b.shape', b.shape)
