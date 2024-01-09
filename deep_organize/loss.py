@@ -28,7 +28,7 @@ def check_point_inside(a, b, dim):
     return res
 
 
-def check_overlap2d(a, b, dim):
+def check_overlap_2d(a, b, dim):
     b0 = b
 
     b1 = b
@@ -53,10 +53,10 @@ def check_overlap2d(a, b, dim):
 def overlap_loss(
     x: torch.Tensor,
     input: torch.Tensor,
-    dim
+    dim:int
 ):
     final_tensor = input
     final_tensor[:,:,0:dim] = x
-
-    b=final_tensor.repeat_interleave(input.shape[1])
+    print('input.shape', input.shape, 'x.shape',x.shape)
+    b=final_tensor.repeat_interleave(input.shape[1], dim=1)
     print('b.shape', b.shape)
