@@ -7,7 +7,7 @@ def equidistance2d_loss(x: torch.Tensor, input: torch.Tensor, target: float = 1.
     return torch.sum(torch.pow(dist - target, 2)) / len(dist)
 
 
-def check_point_inside(a, b, dim):
+def check_point_inside(a, b, dim, i):
     """
     Compute the minmums, and compute the distance to the nearest
     edge if interior. If exterior then return 0 as the minimum.
@@ -17,8 +17,8 @@ def check_point_inside(a, b, dim):
     res = True
     mins = []
     for d in range(dim):
-        am = b[:, :, d] - a[:,:,d]
-        ap = a[:, :, d] + a[:, :, d + dim] - b[:,:,d]
+        am = b[:, i, d] - a[:,:,d]
+        ap = a[:, :, d] + a[:, :, d + dim] - b[:,i,d]
         dist = torch.clamp(torch.minimum(am,ap), min=0.0)
         mins.append(dist)
 
@@ -29,6 +29,7 @@ def check_point_inside(a, b, dim):
 
 
 def check_overlap_2d(a, b, dim):
+
     b0 = b
 
     b1 = b
@@ -41,13 +42,14 @@ def check_overlap_2d(a, b, dim):
     b3[:, :, 0] = b1[:, :, dim + 0]
     b3[:, :, 1] = b2[:, :, dim + 1]
 
-    overlap0 = check_point_inside(a, b0)
-    overlap1 = check_point_inside(a, b1)
-    overlap2 = check_point_inside(a, b2)
-    overlap3 = check_point_inside(a, b3)
+    for i in range(b.shape[1]):
+        overlap0 = check_point_inside(a, b0, 2,i)
+        overlap1 = check_point_inside(a, b1,2, i)
+        overlap2 = check_point_inside(a, b2, 2,i)
+        overlap3 = check_point_inside(a, b3, 2,i)
 
-    minimums = torch.cat([overlap0, overlap1, overlap2, overlap3])
-    res = torch.clamp(torch.min(minimums, dim=2.0), min=0.0)
+        minimums = torch.cat([overlap0, overlap1, overlap2, overlap3])
+        res = torch.clamp(torch.min(minimums, dim=2.0), min=0.0)
 
 
 def overlap_loss(
@@ -57,6 +59,5 @@ def overlap_loss(
 ):
     final_tensor = input
     final_tensor[:,:,0:dim] = x
-    print('input.shape', input.shape, 'x.shape',x.shape)
-    b=final_tensor.repeat_interleave(input.shape[1], dim=1)
-    print('b.shape', b.shape)
+    
+    check_overlap_2d(final_tensor, final_tensor)
