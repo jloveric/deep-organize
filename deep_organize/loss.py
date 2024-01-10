@@ -17,19 +17,20 @@ def check_point_inside(a, b, dim, i):
     res = True
     mins = []
     for d in range(dim):
-        am = b[:, i, d] - a[:,:,d]
-        ap = a[:, :, d] + a[:, :, d + dim] - b[:,i,d]
-        dist = torch.clamp(torch.minimum(am,ap), min=0.0)
+        am = b[:, i, d] - a[:, :, d]
+        ap = a[:, :, d] + a[:, :, d + dim] - b[:, i, d]
+        dist = torch.clamp(torch.minimum(am, ap), min=0.0)
+        print('dist.shape',dist.shape)
         mins.append(dist)
 
-    minimums = torch.cat(mins,dim=2)
+    minimums = torch.cat(mins, dim=1)
+    print('minimums.shape', minimums.shape)
     res = torch.clamp(torch.min(minimums, dim=2), min=0.0)
 
     return res
 
 
 def check_overlap_2d(a, b, dim):
-
     b0 = b
 
     b1 = b
@@ -42,22 +43,22 @@ def check_overlap_2d(a, b, dim):
     b3[:, :, 0] = b1[:, :, dim + 0]
     b3[:, :, 1] = b2[:, :, dim + 1]
 
+    res = 0
     for i in range(b.shape[1]):
-        overlap0 = check_point_inside(a, b0, 2,i)
-        overlap1 = check_point_inside(a, b1,2, i)
-        overlap2 = check_point_inside(a, b2, 2,i)
-        overlap3 = check_point_inside(a, b3, 2,i)
+        overlap0 = check_point_inside(a, b0, 2, i)
+        overlap1 = check_point_inside(a, b1, 2, i)
+        overlap2 = check_point_inside(a, b2, 2, i)
+        overlap3 = check_point_inside(a, b3, 2, i)
 
         minimums = torch.cat([overlap0, overlap1, overlap2, overlap3])
-        res = torch.clamp(torch.min(minimums, dim=2.0), min=0.0)
+        res += torch.sum(torch.clamp(torch.min(minimums, dim=2.0), min=0.0))
+
+    return res
 
 
-def overlap_loss(
-    x: torch.Tensor,
-    input: torch.Tensor,
-    dim:int
-):
-    final_tensor = input
-    final_tensor[:,:,0:dim] = x
-    
-    check_overlap_2d(final_tensor, final_tensor)
+def overlap_loss(x: torch.Tensor, y: torch.Tensor, dim: int):
+    print("x.shape", x.shape, "input.shape", y.shape)
+    final_tensor = x
+    final_tensor[:, :, 0:dim] = y
+
+    return check_overlap_2d(final_tensor, final_tensor, dim=2)

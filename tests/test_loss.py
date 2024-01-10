@@ -7,8 +7,8 @@ def test():
 
     dataset = RectangleDataset(num_rectangles=10, num_samples=7, dim=2)
     dataiter = iter(dataset)
-    data = next(dataiter).unsqueeze(0)
-    other = next(dataiter)[:,:2].unsqueeze(0) # Other only has corner points
-    print('data', data.shape)
+    x = next(dataiter).unsqueeze(0)
+    y = next(dataiter)[:,:2].unsqueeze(0) # Other only has corner points
+    print('data', x.shape)
 
-    res = overlap_loss(data, other,dim=2)
+    res = overlap_loss(x, y,dim=2)
