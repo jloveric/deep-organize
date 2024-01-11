@@ -1,0 +1,9 @@
+loss: box_2d
+
+input_size: 4
+output_size: 2
+n_head : 10
+layers: 4
+bias: True
+dropout: 0
+embedding_size: 100
