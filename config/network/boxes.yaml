@@ -1,4 +1,5 @@
-loss: box_2d
+name: boxes
+loss: overlap_2d
 
 input_size: 4
 output_size: 2

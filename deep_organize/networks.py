@@ -10,7 +10,7 @@ from lion_pytorch import Lion
 from torch import Tensor
 import torch.optim as optim
 from torchmetrics import Accuracy
-from deep_organize.loss import equidistance2d_loss
+from deep_organize.loss import equidistance2d_loss, overlap_loss
 
 
 logger = logging.getLogger(__name__)
@@ -214,13 +214,16 @@ class Net(RegressionMixin, PredictionNetMixin, pl.LightningModule):
         self.save_hyperparameters(cfg)
         self.cfg = cfg
         self.model = Transformer(
-            input_size=cfg.input_size,
-            output_size=cfg.output_size,
-            embedding_size=cfg.embedding_size,
-            layers=cfg.layers,
-            n_head=cfg.n_head,
-            bias=cfg.bias,
-            dropout=cfg.dropout,
+            input_size=cfg.network.input_size,
+            output_size=cfg.network.output_size,
+            embedding_size=cfg.network.embedding_size,
+            layers=cfg.network.layers,
+            n_head=cfg.network.n_head,
+            bias=cfg.network.bias,
+            dropout=cfg.network.dropout,
         )
 
-        self.loss = equidistance2d_loss
+        if cfg.network.loss == "distance_2d":
+            self.loss = equidistance2d_loss
+        elif cfg.network.loss == "overlap_2d":
+            self.loss = overlap_loss

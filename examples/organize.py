@@ -25,18 +25,34 @@ def run_organize(cfg: DictConfig):
     root_dir = hydra.utils.get_original_cwd()
 
     if cfg.train is True:
-        data_module = PointDataModule(
-            num_points=cfg.data.num_points,
-            num_samples=cfg.data.num_samples,
-            batch_size=cfg.batch_size,
-            dim=cfg.data.dims,
-        )
-        lr_monitor = LearningRateMonitor(logging_interval="epoch")
-        trainer = Trainer(
-            max_epochs=cfg.max_epochs,
-            accelerator=cfg.accelerator,
-            callbacks=[lr_monitor, ImageSampler(dim=cfg.data.dims, image_size=64)],
-        )
+
+        if cfg.network.name == "points" :
+            data_module = PointDataModule(
+                num_points=cfg.data.num_points,
+                num_samples=cfg.data.num_samples,
+                batch_size=cfg.batch_size,
+                dim=cfg.data.dims,
+            )
+            lr_monitor = LearningRateMonitor(logging_interval="epoch")
+            trainer = Trainer(
+                max_epochs=cfg.max_epochs,
+                accelerator=cfg.accelerator,
+                callbacks=[lr_monitor, ImageSampler(dim=cfg.data.dims, image_size=64)],
+            )
+        elif cfg.network.name == "boxes" :
+            data_module = PointDataModule(
+                num_points=cfg.data.num_points,
+                num_samples=cfg.data.num_samples,
+                batch_size=cfg.batch_size,
+                dim=cfg.data.dims,
+            )
+            lr_monitor = LearningRateMonitor(logging_interval="epoch")
+            trainer = Trainer(
+                max_epochs=cfg.max_epochs,
+                accelerator=cfg.accelerator,
+                callbacks=[lr_monitor, ImageSampler(dim=cfg.data.dims, image_size=64)],
+            )
+            
         model = Net(cfg)
         trainer.fit(model, datamodule=data_module)
         logger.info("testing")
