@@ -12,3 +12,5 @@ def test():
     print('data', x.shape)
 
     res = overlap_loss(x, y,dim=2)
+
+    assert res > 0.0
