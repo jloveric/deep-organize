@@ -1,4 +1,4 @@
-from deep_organize.loss import check_overlap_2d, check_point_inside, overlap_loss
+from deep_organize.loss import check_overlap_2d, check_point_inside, OverlapLoss
 from deep_organize.datasets import RectangleDataset
 import torch
 
@@ -11,6 +11,7 @@ def test():
     y = next(dataiter)[:,:2].unsqueeze(0) # Other only has corner points
     print('data', x.shape)
 
-    res = overlap_loss(x, y,dim=2)
+    loss = OverlapLoss(dim=2)
+    res = loss(y, x)
 
     assert res > 0.0

@@ -226,4 +226,4 @@ class Net(RegressionMixin, PredictionNetMixin, pl.LightningModule):
         if cfg.network.loss == "distance_2d":
             self.loss = DistanceLoss(target=cfg.network.target)
         elif cfg.network.loss == "overlap_2d":
-            self.loss = OverlapLoss(dim=cfg.data.dims)
+            self.loss = OverlapLoss(dim=2)

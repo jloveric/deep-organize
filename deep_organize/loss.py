@@ -6,8 +6,8 @@ class DistanceLoss:
     def __init__(self, target: float = 1):
         self.target = target
 
-    def __call__(self, x, input):
-        dist = torch.cdist(x, x, p=2)
+    def __call__(self, y, x):
+        dist = torch.cdist(y, y, p=2)
         return torch.sum(torch.pow(dist - self.target, 2)) / len(dist)
 
 
@@ -61,8 +61,9 @@ class OverlapLoss:
     def __init__(self, dim: int = 2):
         self.dim = dim
 
-    def __call__(self, x: torch.Tensor, y: torch.Tensor):
+    def __call__(self, y: torch.Tensor, x: torch.Tensor):
         final_tensor = x
-        final_tensor[:, :, 0 : self.dim] = y
+        print('x.shape', x.shape, 'y.shape', y.shape)
+        final_tensor[:, :, 0 : 2] = y
 
-        return check_overlap_2d(final_tensor, final_tensor, dim=self.dim)
+        return check_overlap_2d(final_tensor, final_tensor, dim=2)
