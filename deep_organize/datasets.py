@@ -25,10 +25,11 @@ class PointDataset(Dataset):
         self._num_samples = num_samples
 
     def __len__(self) -> int:
-        return self._num_samples*self._num_samples
+        return self._num_samples * self._num_samples
 
     def __getitem__(self, idx: int):
-        return self._data[idx%self._num_samples]
+        return self._data[idx % self._num_samples]
+
 
 class RectangleDataset(Dataset):
     def __init__(self, num_rectangles: int, num_samples: int = 1, dim: int = 2):
@@ -41,56 +42,18 @@ class RectangleDataset(Dataset):
         self._dim = dim
 
         # Hyper rectangle, corner position (dim), and length, height, width...(dim)
-        self._data = torch.rand(num_samples, num_rectangles, 2*dim)
+        self._data = torch.rand(num_samples, num_rectangles, 2 * dim)
 
         self._num_samples = num_samples
 
     def __len__(self) -> int:
-        return self._num_samples*self._num_samples
+        return self._num_samples * self._num_samples
 
     def __getitem__(self, idx: int):
-        return self._data[idx%self._num_samples]
+        return self._data[idx % self._num_samples]
 
 
-class PointDataModule(LightningDataModule):
-    def __init__(
-        self,
-        num_points: int = 10,
-        num_samples: int = 1,
-        num_workers: int = 10,
-        dim: int = 2,
-        pin_memory: int = True,
-        batch_size: int = 32,
-        shuffle: bool = True,
-        dataset : Dataset = PointDataset
-    ):
-        super().__init__()
-
-        self._num_points = num_points
-        self._num_samples = num_samples
-        self._num_workers = num_workers
-        self._dim = dim
-        self._pin_memory = pin_memory
-        self._batch_size = batch_size
-        self._shuffle = shuffle
-        self._dataset = dataset
-
-    def collate_fn(self, batch) -> tuple[Tensor, Tensor, list[int]]:
-        # TODO: this does not make sense to me
-        # The max size includes the output
-
-        this_size = random.randint(2, self._num_points - 1)
-        final_features = torch.stack([element[:this_size, :] for element in batch])
-        return final_features
-
-    def setup(self, stage: Optional[str] = None):
-        self._train_dataset = self._dataset(
-            num_points=self._num_points, num_samples=self._num_samples, dim=self._dim
-        )
-        self._test_dataset = self._dataset(
-            num_points=self._num_points, num_samples=self._num_samples, dim=self._dim
-        )
-
+class StandardDataModuleMixin:
     @property
     def train_dataset(self) -> Dataset:
         return self._train_dataset
@@ -119,4 +82,83 @@ class PointDataModule(LightningDataModule):
             num_workers=self._num_workers,
             drop_last=True,
             collate_fn=self.collate_fn,
+        )
+
+
+class PointDataModule(StandardDataModuleMixin,LightningDataModule):
+    def __init__(
+        self,
+        num_points: int = 10,
+        num_samples: int = 1,
+        num_workers: int = 10,
+        dim: int = 2,
+        pin_memory: int = True,
+        batch_size: int = 32,
+        shuffle: bool = True,
+        dataset: Dataset = PointDataset,
+    ):
+        super().__init__()
+
+        self._num_points = num_points
+        self._num_samples = num_samples
+        self._num_workers = num_workers
+        self._dim = dim
+        self._pin_memory = pin_memory
+        self._batch_size = batch_size
+        self._shuffle = shuffle
+        self._dataset = dataset
+
+    def collate_fn(self, batch) -> tuple[Tensor, Tensor, list[int]]:
+        # TODO: this does not make sense to me
+        # The max size includes the output
+
+        this_size = random.randint(2, self._num_points - 1)
+        final_features = torch.stack([element[:this_size, :] for element in batch])
+        return final_features
+
+    def setup(self, stage: Optional[str] = None):
+        self._train_dataset = self._dataset(
+            num_points=self._num_points, num_samples=self._num_samples, dim=self._dim
+        )
+        self._test_dataset = self._dataset(
+            num_points=self._num_points, num_samples=self._num_samples, dim=self._dim
+        )
+
+class RectangleDataModule(StandardDataModuleMixin,LightningDataModule):
+    def __init__(
+        self,
+        num_rectangles: int = 10,
+        num_samples: int = 1,
+        num_workers: int = 10,
+        dim: int = 2,
+        pin_memory: int = True,
+        batch_size: int = 32,
+        shuffle: bool = True,
+        dataset: Dataset = RectangleDataset,
+    ):
+        super().__init__()
+
+        self._num_rectangles = num_rectangles
+        self._num_samples = num_samples
+        self._num_workers = num_workers
+        self._dim = dim
+        self._pin_memory = pin_memory
+        self._batch_size = batch_size
+        self._shuffle = shuffle
+        self._dataset = dataset
+
+    def collate_fn(self, batch) -> tuple[Tensor, Tensor, list[int]]:
+        # TODO: this does not make sense to me
+        # The max size includes the output
+
+        this_size = random.randint(2, self._num_rectangles - 1)
+        final_features = torch.stack([element[:this_size, :] for element in batch])
+        return final_features
+
+    def setup(self, stage: Optional[str] = None):
+        self._train_dataset = self._dataset(
+            num_rectangles=self._num_rectangles, num_samples=self._num_samples, dim=self._dim
+        )
+        self._test_dataset = self._dataset(
+            num_rectangles=self._num_rectangles, num_samples=self._num_samples, dim=self._dim
         )

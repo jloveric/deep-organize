@@ -5,7 +5,7 @@ from lightning import Trainer
 import matplotlib.pyplot as plt
 from lightning.pytorch.callbacks import LearningRateMonitor
 from deep_organize.datasets import (
-    PointDataModule,
+    PointDataModule, RectangleDataModule
 )
 import logging
 from deep_organize.networks import Net
@@ -40,17 +40,17 @@ def run_organize(cfg: DictConfig):
                 callbacks=[lr_monitor, ImageSampler(dim=cfg.data.dims, image_size=64)],
             )
         elif cfg.network.name == "boxes" :
-            data_module = PointDataModule(
-                num_points=cfg.data.num_points,
+            data_module = RectangleDataModule(
+                num_rectangles=cfg.data.num_rectangles,
                 num_samples=cfg.data.num_samples,
                 batch_size=cfg.batch_size,
-                dim=cfg.data.dims,
+                dim=2, #cfg.data.dims,
             )
             lr_monitor = LearningRateMonitor(logging_interval="epoch")
             trainer = Trainer(
                 max_epochs=cfg.max_epochs,
                 accelerator=cfg.accelerator,
-                callbacks=[lr_monitor, ImageSampler(dim=cfg.data.dims, image_size=64)],
+                callbacks=[lr_monitor]
             )
             
         model = Net(cfg)
