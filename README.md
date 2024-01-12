@@ -5,3 +5,7 @@ organize points given constraints
 ```
 python examples/organize.py
 ```
+
+```
+python examples/organize.py network=boxes
+```

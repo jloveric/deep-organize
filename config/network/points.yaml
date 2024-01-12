@@ -1,5 +1,6 @@
 name: points
 loss: distance_2d
+target: 1.0
 
 input_size: 2
 output_size: 2

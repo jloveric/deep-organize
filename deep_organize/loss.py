@@ -2,9 +2,13 @@ import torch
 from typing import Callable
 
 
-def equidistance2d_loss(x: torch.Tensor, input: torch.Tensor, target: float = 1.0):
-    dist = torch.cdist(x, x, p=2)
-    return torch.sum(torch.pow(dist - target, 2)) / len(dist)
+class DistanceLoss:
+    def __init__(self, target: float = 1):
+        self.target = target
+
+    def __call__(self, x, input):
+        dist = torch.cdist(x, x, p=2)
+        return torch.sum(torch.pow(dist - self.target, 2)) / len(dist)
 
 
 def check_point_inside(a, b, dim, i):
@@ -53,8 +57,12 @@ def check_overlap_2d(a, b, dim):
     return res
 
 
-def overlap_loss(x: torch.Tensor, y: torch.Tensor, dim: int):
-    final_tensor = x
-    final_tensor[:, :, 0:dim] = y
+class OverlapLoss:
+    def __init__(self, dim: int = 2):
+        self.dim = dim
 
-    return check_overlap_2d(final_tensor, final_tensor, dim=2)
+    def __call__(self, x: torch.Tensor, y: torch.Tensor):
+        final_tensor = x
+        final_tensor[:, :, 0 : self.dim] = y
+
+        return check_overlap_2d(final_tensor, final_tensor, dim=self.dim)
