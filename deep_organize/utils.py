@@ -42,14 +42,17 @@ def generate_rectangle_result(
 ) -> List[Tensor]:
     model.eval()
 
+    original_list = []
     result_list = []
     for power in range(5):
         data = torch.rand(1, pow(2, power + 1), dim * 2).to(model.device)
         result = model(data)
-        data[:,:,0:2]=result
-        result_list.append(data.detach().to('cpu'))
+        final = data.clone()
+        final[:,:,0:2]=result
+        result_list.append(final.detach().to('cpu'))
+        original_list.append(data.detach().to('cpu'))
 
-    return result_list
+    return result_list, original_list
 
 
 class ImageSampler(Callback):
@@ -113,21 +116,34 @@ class RectangleSampler(Callback):
     @rank_zero_only
     def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
         pl_module.eval()
-        all_data_list = generate_rectangle_result(
+        all_data_list, original_list = generate_rectangle_result(
             model=pl_module,
             dim=self._dim,
         )
 
         for index, data in enumerate(all_data_list):
             ax = plt.gca()
+            original = original_list[index][0]
 
-            for element in data[0]:
+            for eid, element in enumerate(data[0]):
+                original_element = original[eid]
+
                 ax.add_patch(
                     Rectangle(
                         (element[0], element[1]),
                         element[2],
                         element[3],
                         edgecolor="blue",
+                        facecolor="none",
+                        linewidth=2,
+                    )
+                )
+                ax.add_patch(
+                    Rectangle(
+                        (original_element[0], original_element[1]),
+                        original_element[2],
+                        original_element[3],
+                        edgecolor="red",
                         facecolor="none",
                         linewidth=2,
                     )
