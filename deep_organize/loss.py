@@ -28,9 +28,10 @@ def check_point_inside(a, b, dim, i):
         dist = torch.clamp(tmin, min=0.0)
         mins.append(dist)
 
-    minimums = torch.cat(mins, dim=0)
-    print('minimums', minimums)
-    low = torch.min(minimums, dim=0, keepdim=True)[0]
+    minimums = torch.stack(mins, dim=2)
+    #print('minimums', minimums.shape)
+    low = torch.min(minimums, dim=2, keepdim=False)[0]
+    #print('low.shape', low.shape)
     return low
 
 
@@ -69,5 +70,5 @@ class OverlapLoss:
         final_tensor = torch.clone(x)
         final_tensor[:, :, 0 : 2] = y
         ans = check_overlap_2d(final_tensor, final_tensor, dim=2)
-        print('res', ans)
+        #print('res', ans)
         return ans
