@@ -10,7 +10,7 @@ from lion_pytorch import Lion
 from torch import Tensor
 import torch.optim as optim
 from torchmetrics import Accuracy
-from deep_organize.loss import DistanceLoss, OverlapLoss
+from deep_organize.loss import DistanceLoss, OverlapLoss, RegionalLoss
 
 
 logger = logging.getLogger(__name__)
@@ -227,3 +227,5 @@ class Net(RegressionMixin, PredictionNetMixin, pl.LightningModule):
             self.loss = DistanceLoss(target=cfg.network.target)
         elif cfg.network.loss == "overlap_2d":
             self.loss = OverlapLoss(dim=2)
+        elif cfg.network.loss == "regional_2d":
+            self.loss = RegionalLoss(dim=2, target=0)
