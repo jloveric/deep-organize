@@ -45,8 +45,9 @@ def generate_rectangle_result(
     result_list = []
     for power in range(5):
         data = torch.rand(1, pow(2, power + 4), dim * 2).to(model.device)
-        result = model(data).to("cpu")
-        result_list.append(result.detach())
+        result = model(data)
+        data[:,:,0:2]=result
+        result_list.append(data.detach().to('cpu'))
 
     return result_list
 
