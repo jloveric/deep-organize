@@ -82,3 +82,56 @@ class ImageSampler(Callback):
             )
             plt.clf()
         #plt.close()
+            
+class DrawRectangles(Callback):
+    def __init__(
+        self,
+        dim,
+        image_size: int = 64,
+    ) -> None:
+        super().__init__()
+        self._dim = dim
+        self._image_size = image_size
+
+    @rank_zero_only
+    def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
+        pl_module.eval()
+        all_data_list = generate_result(
+            model=pl_module,
+            dim=self._dim,
+        )
+
+        for index, data in enumerate(all_data_list):
+            x = data[0, :, 0]
+            y = data[0, :, 1]
+            plt.scatter(x, y)
+
+            buf = io.BytesIO()
+            plt.savefig(
+                buf,
+                dpi="figure",
+                format=None,
+                metadata=None,
+                bbox_inches=None,
+                pad_inches=0.1,
+                facecolor="auto",
+                edgecolor="auto",
+                backend=None,
+            )
+            buf.seek(0)
+            image = PIL.Image.open(buf)
+            image = transforms.ToTensor()(image)
+            #print('image.shape', image.shape)
+            #trainer.logger.experiment.add_image(
+            #    "img",
+            #    torch.tensor(image).detach().permute(2, 0, 1),
+            #    global_step=trainer.global_step,
+            #)
+            trainer.logger.experiment.add_image(
+                f"img{index}",
+                torch.tensor(image).detach(),
+                global_step=trainer.global_step,
+            )
+            plt.clf()
+        #plt.close()
+
