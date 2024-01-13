@@ -3,7 +3,7 @@ from deep_organize.datasets import RectangleDataset
 import torch
 
 
-def test():
+def test_rectangle_dataset():
 
     dataset = RectangleDataset(num_rectangles=10, num_samples=7, dim=2)
     dataiter = iter(dataset)
@@ -17,3 +17,25 @@ def test():
     res = loss(y, x)
 
     assert res > 0.0
+
+def test_overlap_loss() :
+    loss = OverlapLoss(dim=2)
+
+    data = torch.ones(1,2,4)
+    
+    # First rectangle
+    data[0,0,0] = 0.5
+    data[0,0,1] = 0.5
+    data[0,0,0] = 1
+    data[0,0,1]=1
+    
+    # Second rectangle
+    data[0,1,0] = 0.0
+    data[0,1,1] = 0.0
+    data[0,1,0] = 1
+    data[0,1,1]=1
+
+    # The distance should be 0.5 and since it's counted
+    # twice (as implemented) result should be 0.1
+    res = loss(data[:,:,0:2], data)
+    print('res', res)
