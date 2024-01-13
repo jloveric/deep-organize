@@ -10,6 +10,7 @@ from deep_organize.datasets import (
 import logging
 from deep_organize.networks import Net
 from deep_organize.utils import ImageSampler
+import torch
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -54,7 +55,8 @@ def run_organize(cfg: DictConfig):
             )
             
         model = Net(cfg)
-        trainer.fit(model, datamodule=data_module)
+        with torch.autograd.set_detect_anomaly(True):
+            trainer.fit(model, datamodule=data_module)
         logger.info("testing")
 
         trainer.test(model, datamodule=data_module)
