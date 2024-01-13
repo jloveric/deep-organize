@@ -6,5 +6,5 @@ output_size: 2
 n_head : 10
 layers: 4
 bias: True
-dropout: 0
+dropout: 0.5
 embedding_size: 100

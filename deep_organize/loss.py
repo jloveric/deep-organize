@@ -72,6 +72,7 @@ def check_overlap_2d(a, b, dim):
 
 class OverlapLoss:
     def __init__(self, dim: int = 2):
+        print("Inside overlap loss")
         self.dim = dim
 
     def __call__(self, y: torch.Tensor, x: torch.Tensor):
@@ -84,7 +85,8 @@ class OverlapLoss:
 
 
 class RegionalLoss:
-    def __init__(self, dim: int = 2, target: float = 0, alpha=0.001):
+    def __init__(self, dim: int = 2, target: float = 0, alpha=0.0):
+        print("Inside regional loss")
         self.overlap_loss = OverlapLoss(dim=dim)
         self.distance_loss = DistanceLoss(target=0)
         self.alpha = alpha
