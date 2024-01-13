@@ -9,7 +9,7 @@ from deep_organize.datasets import (
 )
 import logging
 from deep_organize.networks import Net
-from deep_organize.utils import ImageSampler
+from deep_organize.utils import ImageSampler, RectangleSampler
 import torch
 
 logging.basicConfig()
@@ -51,7 +51,7 @@ def run_organize(cfg: DictConfig):
             trainer = Trainer(
                 max_epochs=cfg.max_epochs,
                 accelerator=cfg.accelerator,
-                callbacks=[lr_monitor]
+                callbacks=[lr_monitor, RectangleSampler(dim=2, image_size=64)]
             )
             
         model = Net(cfg)

@@ -11,6 +11,10 @@ import copy
 import io
 from torchvision import transforms
 import PIL
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+from PIL import Image
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +29,23 @@ def generate_result(
     result_list = []
     for power in range(5):
         data = torch.rand(1, pow(2, power + 4), dim).to(model.device)
-        result = model(data).to('cpu')
+        result = model(data).to("cpu")
+        result_list.append(result.detach())
+
+    return result_list
+
+
+def generate_rectangle_result(
+    model: torch.nn,
+    dim: int = 2,
+    device: str = "cpu",
+) -> List[Tensor]:
+    model.eval()
+
+    result_list = []
+    for power in range(5):
+        data = torch.rand(1, pow(2, power + 4), dim * 2).to(model.device)
+        result = model(data).to("cpu")
         result_list.append(result.detach())
 
     return result_list
@@ -69,21 +89,17 @@ class ImageSampler(Callback):
             buf.seek(0)
             image = PIL.Image.open(buf)
             image = transforms.ToTensor()(image)
-            #print('image.shape', image.shape)
-            #trainer.logger.experiment.add_image(
-            #    "img",
-            #    torch.tensor(image).detach().permute(2, 0, 1),
-            #    global_step=trainer.global_step,
-            #)
+            
             trainer.logger.experiment.add_image(
                 f"img{index}",
                 torch.tensor(image).detach(),
                 global_step=trainer.global_step,
             )
             plt.clf()
-        #plt.close()
-            
-class DrawRectangles(Callback):
+        # plt.close()
+
+
+class RectangleSampler(Callback):
     def __init__(
         self,
         dim,
@@ -96,15 +112,25 @@ class DrawRectangles(Callback):
     @rank_zero_only
     def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
         pl_module.eval()
-        all_data_list = generate_result(
+        all_data_list = generate_rectangle_result(
             model=pl_module,
             dim=self._dim,
         )
 
         for index, data in enumerate(all_data_list):
-            x = data[0, :, 0]
-            y = data[0, :, 1]
-            plt.scatter(x, y)
+            ax = plt.gca()
+
+            for element in data[0]:
+                ax.add_patch(
+                    Rectangle(
+                        (element[0], element[1]),
+                        element[2],
+                        element[3],
+                        edgecolor="blue",
+                        facecolor="none",
+                        linewidth=2,
+                    )
+                )
 
             buf = io.BytesIO()
             plt.savefig(
@@ -121,17 +147,11 @@ class DrawRectangles(Callback):
             buf.seek(0)
             image = PIL.Image.open(buf)
             image = transforms.ToTensor()(image)
-            #print('image.shape', image.shape)
-            #trainer.logger.experiment.add_image(
-            #    "img",
-            #    torch.tensor(image).detach().permute(2, 0, 1),
-            #    global_step=trainer.global_step,
-            #)
+            
             trainer.logger.experiment.add_image(
                 f"img{index}",
                 torch.tensor(image).detach(),
                 global_step=trainer.global_step,
             )
             plt.clf()
-        #plt.close()
-
+        # plt.close()
