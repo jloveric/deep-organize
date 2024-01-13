@@ -21,8 +21,8 @@ def check_point_inside(a, b, dim, i):
     res = True
     mins = []
     for d in range(dim):
-        am = b[:, i, d] - a[:, :, d]
-        ap = a[:, :, d] + a[:, :, d + dim] - b[:, i, d]
+        am = b[:, i, d].unsqueeze(1) - a[:, :, d]
+        ap = (a[:, :, d] + a[:, :, d + dim]) - b[:, i, d].unsqueeze(1)
         dist = torch.clamp(torch.minimum(am, ap), min=0.0)
         mins.append(dist)
 
@@ -52,7 +52,7 @@ def check_overlap_2d(a, b, dim):
         overlap3 = check_point_inside(a, b3, 2, i)
 
         minimums = torch.cat([overlap0, overlap1, overlap2, overlap3])
-        res += torch.sum(minimums)
+        res = res + torch.sum(minimums)
 
     return res
 

@@ -8,9 +8,11 @@ def test():
     dataset = RectangleDataset(num_rectangles=10, num_samples=7, dim=2)
     dataiter = iter(dataset)
     x = next(dataiter).unsqueeze(0)
+    x = torch.cat([x, x], dim=0)
     y = next(dataiter)[:,:2].unsqueeze(0) # Other only has corner points
+    y = torch.cat([y,y],dim=0)
     print('data', x.shape)
-
+    print('y.shape', y.shape, 'x.shape', x.shape)
     loss = OverlapLoss(dim=2)
     res = loss(y, x)
 
