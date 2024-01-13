@@ -44,7 +44,7 @@ def generate_rectangle_result(
 
     result_list = []
     for power in range(5):
-        data = torch.rand(1, pow(2, power + 4), dim * 2).to(model.device)
+        data = torch.rand(1, pow(2, power + 1), dim * 2).to(model.device)
         result = model(data)
         data[:,:,0:2]=result
         result_list.append(data.detach().to('cpu'))
@@ -132,6 +132,7 @@ class RectangleSampler(Callback):
                         linewidth=2,
                     )
                 )
+            ax.axis('scaled')
 
             buf = io.BytesIO()
             plt.savefig(
