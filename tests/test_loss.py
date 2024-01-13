@@ -26,16 +26,22 @@ def test_overlap_loss() :
     # First rectangle
     data[0,0,0] = 0.5
     data[0,0,1] = 0.5
-    data[0,0,0] = 1
-    data[0,0,1]=1
+    data[0,0,2] = 1
+    data[0,0,3] = 1
     
     # Second rectangle
     data[0,1,0] = 0.0
     data[0,1,1] = 0.0
-    data[0,1,0] = 1
-    data[0,1,1]=1
+    data[0,1,2] = 1
+    data[0,1,3] = 1
+
+    print('data', data)
 
     # The distance should be 0.5 and since it's counted
     # twice (as implemented) result should be 0.1
-    res = loss(data[:,:,0:2], data)
+    y = data[:,:,0:2]
+    x= data 
+
+    res = loss(y, x)
+    assert res == 0.25
     print('res', res)
