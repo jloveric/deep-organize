@@ -4,7 +4,7 @@ from typing import Callable
 
 def rectangle_center(x, dims: int = 2):
     y = x[:, :, :dims]
-    y[:, :, 0:dims] = x[:, :, 0] + 0.5 * x[:, :, dims : (2 * dims)]
+    y[:, :, 0:dims] = x[:, :, 0:dims] + 0.5 * x[:, :, dims : (2 * dims)]
     return y
 
 
@@ -12,9 +12,9 @@ class DistanceLoss:
     def __init__(self, target: float = 1):
         self.target = target
 
-    def __call__(self, y, x):
+    def __call__(self, y):
         dist = torch.cdist(y, y, p=2)
-        return torch.sum(torch.pow(dist - self.target, 2)) / len(dist)
+        return torch.pow(torch.sum(dist),0.5) / len(dist)
 
 
 def check_point_inside(a, b, dim, i):
@@ -84,17 +84,16 @@ class OverlapLoss:
 
 
 class RegionalLoss:
-    def __init__(self, dim: int = 2, target: float = 0):
+    def __init__(self, dim: int = 2, target: float = 0, alpha=0.001):
         self.overlap_loss = OverlapLoss(dim=dim)
         self.distance_loss = DistanceLoss(target=0)
+        self.alpha = alpha
 
     def __call__(self, y: torch.Tensor, x: torch.Tensor) -> None:
         final_tensor = torch.clone(x)
         final_tensor[:, :, 0:2] = y
 
         loss = self.overlap_loss(y, x)
-        if loss <= 0.0:
-            centers = rectangle_center(x=final_tensor)
-            loss = self.distance_loss(y=centers)
-
-        return loss
+        
+        centers = rectangle_center(x=final_tensor)
+        return loss + self.alpha*self.distance_loss(y=centers)
