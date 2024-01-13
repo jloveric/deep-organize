@@ -57,7 +57,7 @@ def check_overlap_2d(a, b, dim):
         overlap3 = check_point_inside(a, b3, 2, i)
 
         minimums = torch.cat([overlap0, overlap1, overlap2, overlap3])
-        accum=accum+torch.sum(minimums)
+        accum=accum+torch.sum(minimums)/minimums.numel()
 
     return accum
 
