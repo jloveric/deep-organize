@@ -23,4 +23,4 @@ Adding a distance constraint as well and the boxes pack a little bit closer
 ```
 python examples/organize.py network=boxes batch_size=256 lr=1e-2 data.num_samples=100 network.loss=regional_2d data.num_rectangles=20 network.layers=4 network.bias=false network.alpha=0.001
 ```
-![Overlap and distance constraint](images/regonal_constraint.png)
+![Overlap and distance constraint](images/regional_constraint.png)
