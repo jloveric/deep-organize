@@ -9,5 +9,12 @@ python examples/organize.py
 ```
 
 ```
-python examples/organize.py network=boxes batch_size=256 lr=1e-2 data.num_samples=100 network.loss=regional_2d data.num_rectangles=20 network.layers=8
+python examples/organize.py network=boxes batch_size=256 lr=1e-2 data.num_samples=100 network.loss=regional_2d data.num_rectangles=20 network.layers=8 network.bias=false
 ```
+
+## Examples
+Simple example, using a transformer to re-arrange boxes so they don't overlap. Without additional constraints, they can spread out however
+```
+python examples/organize.py network=boxes batch_size=256 lr=1e-2 data.num_samples=100 network.loss=regional_2d data.num_rectangles=20 network.layers=4 network.bias=false
+```
+![Non overlapping boxes](images/sample_no_overlap.jpg)
