@@ -13,8 +13,8 @@ python examples/organize.py network=boxes batch_size=256 lr=1e-2 data.num_sample
 ```
 
 ## Examples
-Simple example, using a transformer to re-arrange boxes so they don't overlap. Without additional constraints, they can spread out however
+Simple example, using a transformer to re-arrange boxes so they don't overlap. The original boxes are in red, stacked on top of one another. We feed in an arbitrary number of boxes for training. Without additional constraints, they can spread out however
 ```
 python examples/organize.py network=boxes batch_size=256 lr=1e-2 data.num_samples=100 network.loss=regional_2d data.num_rectangles=20 network.layers=4 network.bias=false
 ```
-![Non overlapping boxes](images/sample_no_overlap.jpg)
+![Non overlapping boxes](images/sample_no_overlap.png)
