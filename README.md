@@ -19,7 +19,8 @@ python examples/organize.py network=boxes batch_size=256 lr=1e-2 data.num_sample
 ```
 ![Non overlapping boxes](images/sample_no_overlap.png)
 
-Adding a distance constraint as well and the boxes pack a little bit closer
+Adding a distance constraint as well and the boxes pack a little bit closer. Again, the red boxes are the original
+positions (input) fed into the network and the blue boxes are the resulting positions (output).
 ```
 python examples/organize.py network=boxes batch_size=256 lr=1e-2 data.num_samples=100 network.loss=regional_2d data.num_rectangles=20 network.layers=4 network.bias=false network.alpha=0.001
 ```
