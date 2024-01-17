@@ -8,3 +8,4 @@ layers: 4
 bias: True
 dropout: 0.5
 embedding_size: 100
+alpha: 0.1

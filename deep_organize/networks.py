@@ -228,4 +228,4 @@ class Net(RegressionMixin, PredictionNetMixin, pl.LightningModule):
         elif cfg.network.loss == "overlap_2d":
             self.loss = OverlapLoss(dim=2)
         elif cfg.network.loss == "regional_2d":
-            self.loss = RegionalLoss(dim=2, target=0)
+            self.loss = RegionalLoss(dim=2, target=0, alpha=cfg.network.alpha)
